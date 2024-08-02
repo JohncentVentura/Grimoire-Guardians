@@ -6,11 +6,11 @@ public class SummonCard : Card
 {
     [HideInInspector] public float health;
     [HideInInspector] public float damage;
-    [HideInInspector] public float damageInterval;
-    [HideInInspector] public float speed;
-    
+    [HideInInspector] public float movementSpeed;
+
     protected override void InitCardCategory()
-    {
+    {   
+        spriteRenderer = GetComponent<SpriteRenderer>();
         category = GameManager.I.cardsSO.summonCategory;
     }
 }

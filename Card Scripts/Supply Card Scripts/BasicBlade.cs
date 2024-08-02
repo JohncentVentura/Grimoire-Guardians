@@ -8,7 +8,7 @@ public class BasicBlade : SupplyCard
     {
         InitCardCategory();
         manaCost = 3;
-        duration = 16;
+        duration = 6;
         cooldown = 12;
         cardName = "Basic Blade";
     }

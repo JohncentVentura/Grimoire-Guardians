@@ -11,6 +11,7 @@ public class CardsSO : ScriptableObject
     [HideInInspector] public readonly string spellCategory = "Spell";
     [HideInInspector] public readonly string summonCategory = "Summon";
     [HideInInspector] public readonly string supplyCategory = "Supply";
+    [HideInInspector] public readonly string skillCategory = "Skill";
     //Card Origin
     [HideInInspector] public readonly string overworldOrigin = "Overworld";
     [HideInInspector] public readonly string underworldOrigin = "Underworld";
@@ -22,14 +23,15 @@ public class CardsSO : ScriptableObject
 
     [Header("SPELL CARDS")]
     public SpellCard blazeBall;
-    public SpellCard snowBall;
 
     [Header("SUMMON CARDS")]
-    public SummonCard simpleSlime;
     public SummonCard bird;
 
     [Header("SUPPLY CARDS")]
     public SupplyCard basicBlade;
     public SupplyCard basicBow;
 
+    [Header("SKILL CARDS")]
+    public SkillCard snowBall;
+    public SkillCard simpleSlime;
 }

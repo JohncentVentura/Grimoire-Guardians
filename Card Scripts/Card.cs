@@ -13,16 +13,14 @@ public class Card : MonoBehaviour
     [HideInInspector] public float cooldown;
     [HideInInspector] public float duration;
     [HideInInspector] public string cardName;
-    #endregion
 
-    #region "UTILITIES"
     [HideInInspector] public bool isCardUnlock;
     [HideInInspector] public float cooldownTimer;
     [HideInInspector] public float durationTimer;
-    #endregion
 
-    [Header("UI")]
-    public Sprite cardSprite; //Used in UI
+    [HideInInspector] public SpriteRenderer spriteRenderer;
+    public SkillCard skillCard;
+    #endregion
 
     public virtual void InitCard()
     {

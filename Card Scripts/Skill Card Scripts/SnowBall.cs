@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimpleSlime : SummonCard
+public class SnowBall : SkillCard
 {
     public override void InitCard()
     {
         InitCardCategory();
-        manaCost = 2;
-        duration = 14;
-        cooldown = 8;
-        cardName = "Simple Slime";
+        manaCost = 1;
+        cooldown = 10;
+        duration = 6;
+        cardName = "Snow Ball";
     }
 }

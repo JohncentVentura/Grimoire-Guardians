@@ -35,6 +35,7 @@ public class CardButton : MonoBehaviour
 
     public void UpdateCardData(Card card)
     {
+        /*
         for (int j = 0; j < GameManager.I.cardsSO.cardOrigins.Length; j++)
         {
             if (card.origin == GameManager.I.cardsSO.cardOrigins[j])
@@ -42,8 +43,9 @@ public class CardButton : MonoBehaviour
                 borderImage.sprite = GameManager.I.cardsSO.originImageSprites[j];
             }
         }
+        */
 
-        cardImage.sprite = card.cardSprite;
+        cardImage.sprite = card.spriteRenderer.sprite;
         cooldownSlider.maxValue = card.cooldown;
         cooldownSlider.value = card.cooldownTimer;
         manaCostText.text = "" + card.manaCost.ToString();

@@ -28,7 +28,7 @@ public class GameManager : MonoBehaviour
         playerSO.worldPosition = Vector2.zero;
         playerSO.maxHealth = 10;
         playerSO.currentHealth = playerSO.maxHealth;
-        playerSO.maxMana = 6;
+        playerSO.maxMana = 10;
         playerSO.currentMana = playerSO.maxMana;
         playerSO.manaRegeneration = 0.001f;
         playerSO.moveSpeed = 60;
@@ -39,11 +39,28 @@ public class GameManager : MonoBehaviour
         playerSO.deck.Insert(1, cardsSO.bird);
         playerSO.deck.Insert(2, cardsSO.basicBlade);
         playerSO.deck.Insert(3, cardsSO.basicBow);
-        foreach (Card card in playerSO.deck) card.InitCard();
 
         playerSO.handCards = new List<Card>();
-        playerSO.benchCards = new List<Card>();
-        for (int i = 0; i < playerSO.handSize; i++) playerSO.handCards.Insert(i, playerSO.deck[i]);
+        playerSO.skillCards = new List<Card>();
+        playerSO.activeCards = new List<Card>();
+
+        for (int i = 0; i < playerSO.handSize; i++)
+        {
+            playerSO.handCards.Insert(i, playerSO.deck[i]);
+            playerSO.handCards[i].InitCard();
+
+            if (playerSO.handCards[i].skillCard)
+            {
+                playerSO.skillCards.Insert(i, playerSO.handCards[i].skillCard);
+                playerSO.skillCards[i].InitCard();
+            }
+            else
+            {
+                playerSO.skillCards.Insert(i, null);
+            }
+
+            playerSO.activeCards.Insert(i, null); //Assign cards when handCards are played
+        }
     }
 
     public void LoadNextScene(string nextSceneName)

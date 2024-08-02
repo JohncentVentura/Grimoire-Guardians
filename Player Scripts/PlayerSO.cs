@@ -18,7 +18,8 @@ public class PlayerSO : ScriptableObject
     [Header("Cards")]
     [HideInInspector] public List<Card> deck;
     [HideInInspector] public List<Card> handCards;
-    [HideInInspector] public List<Card> benchCards;
+    [HideInInspector] public List<Card> skillCards;
+    [HideInInspector] public List<Card> activeCards;
     [HideInInspector] public readonly int handSize = 4;
 
 }

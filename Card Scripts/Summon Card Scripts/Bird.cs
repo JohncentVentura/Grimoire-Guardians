@@ -8,7 +8,7 @@ public class Bird : SummonCard
     {
         InitCardCategory();
         manaCost = 3;
-        duration = 12;
+        duration = 6;
         cooldown = 4;
         cardName = "Bird";
     }

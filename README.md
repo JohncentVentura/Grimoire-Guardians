@@ -10,3 +10,4 @@
 CODE DESIGN
 Manager Scripts: Contains data, global methods, and are singleton that persists through scenes 
 Controller Scripts: Controls GameObject, communicates with Manager Scripts, and can be prefabs
+

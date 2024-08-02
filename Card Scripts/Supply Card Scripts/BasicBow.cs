@@ -8,7 +8,7 @@ public class BasicBow : SupplyCard
     {
         InitCardCategory();
         manaCost = 4;
-        duration = 14;
+        duration = 6;
         cooldown = 10;
         cardName = "Basic Bow";
     }

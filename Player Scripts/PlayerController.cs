@@ -45,20 +45,19 @@ public class PlayerController : MonoBehaviour
             Debug.Log("Player Attack");
         });
 
-        //Input for playing cards
         for (int i = 0; i < GameManager.I.playerSO.handSize; i++)
         {
+            //Input for playing cards
             InputManager.I.PlayerSetButtonDown(InputManager.I.playerCardKeys[i], () =>
             {
                 PlayCard(i);
             });
-        }
 
-        //Cooldown timer & Duration timer of cards in deck
-        for (int i = 0; i < GameManager.I.playerSO.deck.Count; i++)
-        {
-            CardCooldownTimerCountdown(i);
-            CardDurationTimerCountdown(i);
+            //Cooldown timer
+            HandCardCooldownTimer(i);
+
+            //Duration timer
+            ActiveCardDurationTimer(i);
         }
 
         //Mana regeneration timer
@@ -86,7 +85,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    #region TODO:_TRANSFER_FUNC_BELOW_TO_CARDS
+    #region CARDS
     public void PlayCard(int i)
     {
         if (GameManager.I.playerSO.currentMana >= GameManager.I.playerSO.handCards[i].manaCost && GameManager.I.playerSO.handCards[i].cooldownTimer <= 0)
@@ -108,11 +107,27 @@ public class PlayerController : MonoBehaviour
                 cardObject.transform.parent = backHand.transform;
                 cardObject.transform.position = backHand.transform.position;
             }
+            else if (cardObject.category == GameManager.I.cardsSO.skillCategory)
+            {
+                cardObject.transform.parent = transform.parent;
+                cardObject.transform.position = summonPosition.transform.position;
+            }
 
             cardObject.UseCard();
             GameManager.I.playerSO.currentMana -= GameManager.I.playerSO.handCards[i].manaCost;
-            GameManager.I.playerSO.handCards[i].cooldownTimer = GameManager.I.playerSO.handCards[i].cooldown;
-            GameManager.I.playerSO.handCards[i].durationTimer = GameManager.I.playerSO.handCards[i].duration;
+
+            if (GameManager.I.playerSO.handCards[i].skillCard)
+            {
+                GameManager.I.playerSO.activeCards[i] = GameManager.I.playerSO.handCards[i];
+                GameManager.I.playerSO.activeCards[i].durationTimer = GameManager.I.playerSO.activeCards[i].duration;
+                GameManager.I.playerSO.handCards[i] = GameManager.I.playerSO.handCards[i].skillCard;
+                GameManager.I.playerSO.handCards[i].cooldown = 0;
+            }
+            else if (!GameManager.I.playerSO.handCards[i].skillCard)
+            {
+                GameManager.I.playerSO.handCards[i].cooldownTimer = GameManager.I.playerSO.handCards[i].cooldown;
+                GameManager.I.playerSO.handCards[i].durationTimer = GameManager.I.playerSO.handCards[i].duration;
+            }
         }
         else if (GameManager.I.playerSO.currentMana < GameManager.I.playerSO.handCards[i].manaCost)
         {
@@ -124,28 +139,35 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void CardCooldownTimerCountdown(int i)
+    public void HandCardCooldownTimer(int i)
     {
-        if (GameManager.I.playerSO.deck[i].cooldownTimer > 0)
+        if (GameManager.I.playerSO.handCards[i].cooldownTimer > 0)
         {
-            GameManager.I.playerSO.deck[i].cooldownTimer -= Time.deltaTime;
+            GameManager.I.playerSO.handCards[i].cooldownTimer -= Time.deltaTime;
         }
-        else if (GameManager.I.playerSO.deck[i].cooldownTimer < 0)
+        else if (GameManager.I.playerSO.handCards[i].cooldownTimer <= 0)
         {
-            GameManager.I.playerSO.deck[i].cooldownTimer = 0;
+            GameManager.I.playerSO.handCards[i].cooldownTimer = 0;
         }
     }
 
-    public void CardDurationTimerCountdown(int i)
+    public void ActiveCardDurationTimer(int i)
     {
-        if (GameManager.I.playerSO.deck[i].durationTimer > 0)
+        if (GameManager.I.playerSO.activeCards[i])
         {
-            GameManager.I.playerSO.deck[i].durationTimer -= Time.deltaTime;
-        }
-        else if (GameManager.I.playerSO.deck[i].durationTimer < 0)
-        {
-            GameManager.I.playerSO.deck[i].durationTimer = 0;
+            if (GameManager.I.playerSO.activeCards[i].durationTimer > 0)
+            {
+                GameManager.I.playerSO.activeCards[i].durationTimer -= Time.deltaTime;
+                Debug.Log(GameManager.I.playerSO.activeCards[i].durationTimer);
+            }
+            else if (GameManager.I.playerSO.activeCards[i].durationTimer < 0)
+            {
+                GameManager.I.playerSO.activeCards[i].durationTimer = 0;
+                GameManager.I.playerSO.handCards[i] = GameManager.I.playerSO.activeCards[i];
+                GameManager.I.playerSO.activeCards[i] = null;
+            }
         }
     }
     #endregion
+    
 }
