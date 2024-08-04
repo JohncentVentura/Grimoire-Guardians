@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimpleSlime : SkillCard
+public class SimpleSlime : SummonCard
 {
     public override void InitCard()
     {

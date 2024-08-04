@@ -18,8 +18,8 @@ public class PlayerSO : ScriptableObject
     [Header("Cards")]
     [HideInInspector] public List<Card> deck;
     [HideInInspector] public List<Card> handCards;
-    [HideInInspector] public List<Card> skillCards;
-    [HideInInspector] public List<Card> activeCards;
     [HideInInspector] public readonly int handSize = 4;
-
+    [HideInInspector] public List<Card> activeSpells;
+    [HideInInspector] public List<Card> activeSummons;
+    [HideInInspector] public SupplyCard activeSupply; //Can only equip 1 supply card
 }

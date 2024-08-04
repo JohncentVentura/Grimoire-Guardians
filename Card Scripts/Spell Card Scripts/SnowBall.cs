@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SnowBall : SkillCard
+public class SnowBall : SpellCard
 {
     public override void InitCard()
     {

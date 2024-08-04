@@ -7,6 +7,6 @@ public class SupplyCard : Card
     protected override void InitCardCategory()
     {   
         spriteRenderer = GetComponent<SpriteRenderer>();
-        category = GameManager.I.cardsSO.supplyCategory;
+        category = GameManager.I.cardsSO.cardCategoriesDictionary["supply"];
     }
 }

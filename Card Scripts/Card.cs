@@ -6,7 +6,9 @@ using UnityEngine.UI;
 
 public class Card : MonoBehaviour
 {
-    #region "STATS"
+    #region "COMPONENTS & STATS"
+    [HideInInspector] public SpriteRenderer spriteRenderer;
+
     [HideInInspector] public string category;
     [HideInInspector] public string origin;
     [HideInInspector] public float manaCost;
@@ -17,11 +19,9 @@ public class Card : MonoBehaviour
     [HideInInspector] public bool isCardUnlock;
     [HideInInspector] public float cooldownTimer;
     [HideInInspector] public float durationTimer;
-
-    [HideInInspector] public SpriteRenderer spriteRenderer;
-    public SkillCard skillCard;
     #endregion
 
+    #region PUBLIC_FUNCTIONS
     public virtual void InitCard()
     {
 
@@ -32,6 +32,7 @@ public class Card : MonoBehaviour
         //UseCard() body by default
         Debug.Log("Player uses a " + manaCost + " Cost " + category + " card called " + cardName);
     }
+    #endregion
 
     #region PROTECTED_FUNCTIONS
     protected virtual void InitCardCategory()
@@ -39,9 +40,8 @@ public class Card : MonoBehaviour
 
     }
     #endregion
+
 }
-
-
 
 /*
 public override void InitCard()

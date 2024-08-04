@@ -66,5 +66,5 @@ public class HUDPanelController : MonoBehaviour
             }
         }
     }
+    
 }
-

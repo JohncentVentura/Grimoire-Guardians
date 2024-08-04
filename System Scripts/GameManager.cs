@@ -39,27 +39,12 @@ public class GameManager : MonoBehaviour
         playerSO.deck.Insert(1, cardsSO.bird);
         playerSO.deck.Insert(2, cardsSO.basicBlade);
         playerSO.deck.Insert(3, cardsSO.basicBow);
-
+        
         playerSO.handCards = new List<Card>();
-        playerSO.skillCards = new List<Card>();
-        playerSO.activeCards = new List<Card>();
-
         for (int i = 0; i < playerSO.handSize; i++)
         {
             playerSO.handCards.Insert(i, playerSO.deck[i]);
             playerSO.handCards[i].InitCard();
-
-            if (playerSO.handCards[i].skillCard)
-            {
-                playerSO.skillCards.Insert(i, playerSO.handCards[i].skillCard);
-                playerSO.skillCards[i].InitCard();
-            }
-            else
-            {
-                playerSO.skillCards.Insert(i, null);
-            }
-
-            playerSO.activeCards.Insert(i, null); //Assign cards when handCards are played
         }
     }
 
