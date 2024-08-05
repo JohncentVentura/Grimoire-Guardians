@@ -13,13 +13,13 @@ public class PlayerSO : ScriptableObject
     [HideInInspector] public float currentMana;
     [HideInInspector] public float manaRegeneration;
     [HideInInspector] public float moveSpeed;
-    [HideInInspector] public Vector2 moveDirection;
+    [HideInInspector] public Vector2 playerDirection; //Always has a value, cannot become Vector.Zero
 
     [Header("Cards")]
     [HideInInspector] public List<Card> deck;
     [HideInInspector] public List<Card> handCards;
     [HideInInspector] public readonly int handSize = 4;
-    [HideInInspector] public List<Card> activeSpells;
-    [HideInInspector] public List<Card> activeSummons;
-    [HideInInspector] public SupplyCard activeSupply; //Can only equip 1 supply card
+    [HideInInspector] public List<SpellCard> activeSpells; //Spell cards that are Instantiated
+    [HideInInspector] public List<SummonCard> activeSummons; //Summon cards that are Instantiated
+    [HideInInspector] public SupplyCard activeSupply; //ONLY 1 Supply card that is Instantiated
 }

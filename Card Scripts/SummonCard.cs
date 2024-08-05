@@ -11,6 +11,6 @@ public class SummonCard : Card
     protected override void InitCardCategory()
     {   
         spriteRenderer = GetComponent<SpriteRenderer>();
-        category = GameManager.I.cardsSO.cardCategoriesDictionary["summon"];
+        category = GameManager.I.cardsSO.cardCategoriesDict["Summon"];
     }
 }

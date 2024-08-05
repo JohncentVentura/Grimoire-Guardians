@@ -4,30 +4,31 @@ using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour //Inputs & Cards
 {
     [Header("Player Components & Children")]
+    [HideInInspector] public PlayerStateMachine playerStateMachine;
+    [HideInInspector] public Animator animator;
     [HideInInspector] public Rigidbody2D rb;
     [HideInInspector] public Transform centerPosition;
     [HideInInspector] public Transform frontHand; //Starting position of spell card objects
-    [HideInInspector] public Transform backHand; //Parent & position of supply card objects
-
-    [Header("PlayerController & Inputs")]
-    [HideInInspector] public Vector2 moveInput;
-    [HideInInspector] public Vector2 moveDirection;
+    [HideInInspector] public Transform backHand;
+    [HideInInspector] public Transform equipPosition; //Parent & position of supply card objects
 
     //[Header("Utilities")]
     //public CinemachineVirtualCamera cinemachineVirtualCamera;
 
     private void Start()
     {
+        playerStateMachine = GetComponent<PlayerStateMachine>();
+        playerStateMachine.state = PlayerStateMachine.STATES.IDLE;
+        animator = GetComponent<Animator>();
+        animator.SetFloat("PlayerDirection", GameManager.I.playerSO.playerDirection.x);
         rb = GetComponent<Rigidbody2D>();
         centerPosition = transform.GetChild(0);
         frontHand = centerPosition.transform.GetChild(0);
         backHand = centerPosition.transform.GetChild(1);
-
-        moveInput = Vector2.zero;
-        moveDirection = Vector2.right;
+        equipPosition = transform.GetChild(1);
 
         //cinemachineVirtualCamera.Follow = centerPosition.transform;
     }
@@ -35,12 +36,52 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         //Input for player movement
-        moveInput = InputManager.I.PlayerGetAxisRaw();
+        if (InputManager.I.canPlayerInput && InputManager.I.PlayerGetAxisRaw() != Vector2.zero)
+        {
+            if (InputManager.I.PlayerGetAxisRaw().x != 0)
+            {
+                GameManager.I.playerSO.playerDirection = InputManager.I.PlayerGetAxisRaw();
+                animator.SetFloat("PlayerDirection", GameManager.I.playerSO.playerDirection.x);
+
+                if (GameManager.I.playerSO.activeSupply)
+                {
+                    GameManager.I.playerSO.activeSupply.animator.SetFloat("PlayerDirection", GameManager.I.playerSO.playerDirection.x);
+                }
+            }
+
+            playerStateMachine.state = PlayerStateMachine.STATES.MOVE;
+        }
+        else if (InputManager.I.canPlayerInput && InputManager.I.PlayerGetAxisRaw() == Vector2.zero)
+        {
+            playerStateMachine.state = PlayerStateMachine.STATES.IDLE;
+        }
 
         //Input for player attacking
         InputManager.I.PlayerSetButtonDown(InputManager.I.playerAttackKey, () =>
         {
-            Debug.Log("Player Attack");
+            InputManager.I.canPlayerInput = false;
+            if (GameManager.I.playerSO.activeSupply == null)
+            {
+                Debug.Log("Player can only attack if equipped with a supply card");
+                InputManager.I.canPlayerInput = true;
+            }
+            else if (GameManager.I.playerSO.activeSupply.type == GameManager.I.cardsSO.supplyCardTypesDict["Sword"])
+            {
+                playerStateMachine.state = PlayerStateMachine.STATES.SWORD_ATK;
+                GameManager.I.playerSO.activeSupply.state = SupplyCard.STATES.ATTACK;
+            }
+            else if (GameManager.I.playerSO.activeSupply.type == GameManager.I.cardsSO.supplyCardTypesDict["Heavy"])
+            {
+
+            }
+            else if (GameManager.I.playerSO.activeSupply.type == GameManager.I.cardsSO.supplyCardTypesDict["Bow"])
+            {
+
+            }
+            else if (GameManager.I.playerSO.activeSupply.type == GameManager.I.cardsSO.supplyCardTypesDict["Staff"])
+            {
+
+            }
         });
 
         for (int i = 0; i < GameManager.I.playerSO.handSize; i++)
@@ -69,44 +110,44 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        //Player movement
-        if (moveInput == Vector2.zero)
-        {
-            rb.velocity = Vector2.zero * Time.deltaTime * moveInput;
-        }
-        else if (moveInput != Vector2.zero)
-        {
-            rb.velocity = GameManager.I.playerSO.moveSpeed * Time.deltaTime * moveInput;
-            GameManager.I.playerSO.moveDirection = moveInput;
-        }
-    }
-
     #region CARDS
     public void PlayCard(int i)
     {
         if (GameManager.I.playerSO.currentMana >= GameManager.I.playerSO.handCards[i].manaCost && GameManager.I.playerSO.handCards[i].cooldownTimer <= 0)
         {
-            Card cardObject = Instantiate(GameManager.I.playerSO.handCards[i]);
-
-            if (cardObject.category == GameManager.I.cardsSO.cardCategoriesDictionary["spell"])
+            if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoriesDict["Spell"])
             {
-                cardObject.transform.parent = transform.parent;
+                SpellCard cardObject = Instantiate((SpellCard)GameManager.I.playerSO.handCards[i]);
+                cardObject.transform.parent = transform.parent.Find("Spells");
                 cardObject.transform.position = frontHand.transform.position;
+                cardObject.UseCard();
             }
-            else if (cardObject.category == GameManager.I.cardsSO.cardCategoriesDictionary["summon"])
+            else if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoriesDict["Summon"])
             {
-                cardObject.transform.parent = transform.parent;
+                SummonCard cardObject = Instantiate((SummonCard)GameManager.I.playerSO.handCards[i]);
+                cardObject.transform.parent = transform.parent.Find("Summons");
                 cardObject.transform.position = centerPosition.position;
+                cardObject.UseCard();
             }
-            else if (cardObject.category == GameManager.I.cardsSO.cardCategoriesDictionary["supply"])
+            else if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoriesDict["Supply"])
             {
-                cardObject.transform.parent = backHand.transform;
-                cardObject.transform.position = backHand.transform.position;
+                //Destroy current activeSupply so that there can only be 1 activeSupply
+                if (GameManager.I.playerSO.activeSupply)
+                {
+                    Destroy(equipPosition.GetChild(0).gameObject);
+                    GameManager.I.playerSO.activeSupply = null;
+                }
+
+                SupplyCard cardObject = Instantiate((SupplyCard)GameManager.I.playerSO.handCards[i]);
+                GameManager.I.playerSO.activeSupply = cardObject;
+                Debug.Log("activeSupply: " + GameManager.I.playerSO.activeSupply);
+                cardObject.transform.parent = equipPosition.transform;
+                cardObject.transform.position = equipPosition.transform.position;
+                GameManager.I.playerSO.activeSupply.animator.SetFloat("PlayerDirection", GameManager.I.playerSO.playerDirection.x);
+                GameManager.I.playerSO.activeSupply.state = SupplyCard.STATES.IDLE;
+                cardObject.UseCard();
             }
 
-            cardObject.UseCard();
             GameManager.I.playerSO.currentMana -= GameManager.I.playerSO.handCards[i].manaCost;
             GameManager.I.playerSO.handCards[i].cooldownTimer = GameManager.I.playerSO.handCards[i].cooldown;
             GameManager.I.playerSO.handCards[i].durationTimer = GameManager.I.playerSO.handCards[i].duration;

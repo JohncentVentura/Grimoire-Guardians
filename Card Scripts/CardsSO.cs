@@ -7,8 +7,12 @@ using UnityEngine;
 public class CardsSO : ScriptableObject
 {
     #region CARD_STATS
-    [HideInInspector] public readonly Dictionary<string, string> cardCategoriesDictionary = new() { { "spell", "Spell" }, { "summon", "Summon" }, { "supply", "Supply" } };
-    public List<Sprite> originImageSprites;
+    [HideInInspector] public readonly Dictionary<string, string> cardCategoriesDict = new() { { "Spell", "Spell" }, { "Summon", "Summon" }, { "Supply", "Supply" } };
+    [HideInInspector] public readonly Dictionary<string, string> spellCardTypesDict = new() { { "spell", "Spell" }, { "summon", "Summon" }, { "supply", "Supply" } };
+    [HideInInspector] public readonly Dictionary<string, string> summonCardTypesDict = new() { { "spell", "Spell" }, { "summon", "Summon" }, { "supply", "Supply" } };
+    [HideInInspector] public readonly Dictionary<string, string> supplyCardTypesDict 
+        = new() { { "Sword", "Sword" }, { "Heavy", "Heavy" }, { "Bow", "Bow" }, { "Staff", "Staff" }, { "Polearm", "Polearm" } };
+    
     #endregion
 
     [Header("SPELL CARDS")]

@@ -30,22 +30,26 @@ public class GameManager : MonoBehaviour
         playerSO.currentHealth = playerSO.maxHealth;
         playerSO.maxMana = 10;
         playerSO.currentMana = playerSO.maxMana;
-        playerSO.manaRegeneration = 0.001f;
+        playerSO.manaRegeneration = 0.01f; //0.001f;
         playerSO.moveSpeed = 60;
-        playerSO.moveDirection = Vector2.right;
+        playerSO.playerDirection = Vector2.right;
 
         playerSO.deck = new List<Card>();
         playerSO.deck.Insert(0, cardsSO.blazeBall);
         playerSO.deck.Insert(1, cardsSO.bird);
         playerSO.deck.Insert(2, cardsSO.basicBlade);
         playerSO.deck.Insert(3, cardsSO.basicBow);
-        
+
         playerSO.handCards = new List<Card>();
         for (int i = 0; i < playerSO.handSize; i++)
         {
             playerSO.handCards.Insert(i, playerSO.deck[i]);
             playerSO.handCards[i].InitCard();
         }
+
+        playerSO.activeSpells = new List<SpellCard>();
+        playerSO.activeSummons = new List<SummonCard>();
+        playerSO.activeSupply = null;
     }
 
     public void LoadNextScene(string nextSceneName)

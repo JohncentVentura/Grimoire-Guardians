@@ -7,6 +7,7 @@ public class BasicBow : SupplyCard
     public override void InitCard()
     {
         InitCardCategory();
+        type = GameManager.I.cardsSO.supplyCardTypesDict["Bow"];
         manaCost = 4;
         duration = 6;
         cooldown = 10;

@@ -7,6 +7,6 @@ public class SpellCard : Card
     protected override void InitCardCategory()
     {   
         spriteRenderer = GetComponent<SpriteRenderer>();
-        category = GameManager.I.cardsSO.cardCategoriesDictionary["spell"];
+        category = GameManager.I.cardsSO.cardCategoriesDict["Spell"];
     }
 }
