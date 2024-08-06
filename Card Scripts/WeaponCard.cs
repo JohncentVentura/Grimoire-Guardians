@@ -31,9 +31,13 @@ public class WeaponCard : Card
         }
     }
 
-    public void ResetState() => state = STATES.IDLE;
-    
-    protected void IdleState(bool isUsingPhysics)
+    public void ResetState() //Called as an event in animation
+    {
+        state = STATES.IDLE;
+        transform.rotation = Quaternion.identity; //For Bow-type & Staff-type Weapons
+    }
+
+    protected virtual void IdleState(bool isUsingPhysics)
     {
         if (isUsingPhysics)
         {
@@ -45,7 +49,7 @@ public class WeaponCard : Card
         }
     }
 
-    protected void AttackState(bool isUsingPhysics)
+    protected virtual void AttackState(bool isUsingPhysics)
     {
         if (isUsingPhysics)
         {

@@ -22,6 +22,28 @@ public class PlayerStateMachine : MonoBehaviour //State & Animations
     private void Start() => playerController = GetComponent<PlayerController>();
     private void Update() => SwitchStates(false);
     private void FixedUpdate() => SwitchStates(true);
+    private void LateUpdate()
+    {
+        //Some playerController properties are being animated, we can only override it in LateUpdate()
+        if (state == STATES.BOW_ATK || state == STATES.STAFF_ATK)
+        {
+            //Follow Mouse Cursor
+            float maxDistance = 0.15f;
+            Vector3 mouseDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mouseDistance = Vector2.ClampMagnitude(mouseDirection - playerController.centerPosition.transform.position, maxDistance);
+            playerController.equipPosition.transform.position = mouseDistance + playerController.centerPosition.transform.position;
+            Debug.Log("equipPosition: " + playerController.equipPosition.transform.position);
+
+            //Rotate to Mouse Cursor
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = 5.23f;
+            Vector3 objectPos = Camera.main.WorldToScreenPoint(playerController.centerPosition.transform.position);
+            mousePos.x -= objectPos.x;
+            mousePos.y -= objectPos.y;
+            float angle = Mathf.Atan2(mousePos.y, mousePos.x) * Mathf.Rad2Deg;
+            playerController.equipPosition.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        }
+    }
 
     private void SwitchStates(bool isUsingPhysics)
     {
@@ -57,9 +79,10 @@ public class PlayerStateMachine : MonoBehaviour //State & Animations
         }
     }
 
-    public void ResetState() //An event in animation
+    public void ResetState() //Called as an event in animation
     {
         state = STATES.IDLE;
+        playerController.equipPosition.rotation = Quaternion.identity; //For Bow-type & Staff-type Weapons
         InputManager.I.canPlayerInput = true;
     }
 
@@ -91,7 +114,7 @@ public class PlayerStateMachine : MonoBehaviour //State & Animations
     {
         if (isUsingPhysics) //Called in FixedUpdate()
         {
-
+            playerController.rb.velocity = Vector2.zero * Time.fixedDeltaTime;
         }
         else //Called in Update()
         {
@@ -103,7 +126,7 @@ public class PlayerStateMachine : MonoBehaviour //State & Animations
     {
         if (isUsingPhysics) //Called in FixedUpdate()
         {
-
+            playerController.rb.velocity = Vector2.zero * Time.fixedDeltaTime;
         }
         else //Called in Update()
         {
@@ -127,7 +150,7 @@ public class PlayerStateMachine : MonoBehaviour //State & Animations
     {
         if (isUsingPhysics) //Called in FixedUpdate()
         {
-
+            playerController.rb.velocity = Vector2.zero * Time.fixedDeltaTime;
         }
         else //Called in Update()
         {
@@ -139,7 +162,7 @@ public class PlayerStateMachine : MonoBehaviour //State & Animations
     {
         if (isUsingPhysics) //Called in FixedUpdate()
         {
-
+            playerController.rb.velocity = Vector2.zero * Time.fixedDeltaTime;
         }
         else //Called in Update()
         {
@@ -151,11 +174,11 @@ public class PlayerStateMachine : MonoBehaviour //State & Animations
     {
         if (isUsingPhysics) //Called in FixedUpdate()
         {
-
+            playerController.rb.velocity = Vector2.zero * Time.fixedDeltaTime;
         }
         else //Called in Update()
         {
-
+            playerController.animator.Play("BowATKState");
         }
     }
 
@@ -163,7 +186,7 @@ public class PlayerStateMachine : MonoBehaviour //State & Animations
     {
         if (isUsingPhysics) //Called in FixedUpdate()
         {
-
+            playerController.rb.velocity = Vector2.zero * Time.fixedDeltaTime;
         }
         else //Called in Update()
         {

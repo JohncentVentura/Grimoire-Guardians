@@ -13,4 +13,8 @@ public class BeginnersBow : WeaponCard
         cooldown = 4;
         cardName = "Beginner's Bow";
     }
+
+    private void Update() => SwitchStates(false);
+    private void FixedUpdate() => SwitchStates(true);
+    
 }

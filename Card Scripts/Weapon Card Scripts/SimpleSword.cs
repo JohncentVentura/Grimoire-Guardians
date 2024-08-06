@@ -16,4 +16,5 @@ public class SimpleSword : WeaponCard
 
     private void Update() => SwitchStates(false);
     private void FixedUpdate() => SwitchStates(true);
+    
 }

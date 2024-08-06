@@ -45,9 +45,9 @@ public class InputManager : MonoBehaviour
     public void PlayerSetButtonDown(string input, Action callback)
     {
         if (canPlayerInput && Input.GetButtonDown(input))
-        {   
+        {
             callback?.Invoke();
         }
     }
-    
+
 }
