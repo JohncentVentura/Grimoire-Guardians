@@ -2,16 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BasicBlade : SupplyCard
+public class SimpleSword : WeaponCard
 {
     public override void InitCard()
     {
         InitCardCategory();
-        type = GameManager.I.cardsSO.supplyCardTypesDict["Sword"];
+        type = GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.SWORD];
         manaCost = 3;
-        duration = 6;
+        duration = 13;
         cooldown = 3;
-        cardName = "Basic Blade";
+        cardName = "Simple Sword";
     }
 
     private void Update() => SwitchStates(false);

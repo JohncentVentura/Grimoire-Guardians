@@ -2,14 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SimpleSlime : SummonCard
+public class Bird : CreatureCard
 {
     public override void InitCard()
     {
         InitCardCategory();
-        manaCost = 2;
+        manaCost = 3;
         duration = 6;
-        cooldown = 8;
-        cardName = "Simple Slime";
+        cooldown = 4;
+        cardName = "Bird";
     }
 }

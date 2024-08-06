@@ -19,7 +19,7 @@ public class PlayerSO : ScriptableObject
     [HideInInspector] public List<Card> deck;
     [HideInInspector] public List<Card> handCards;
     [HideInInspector] public readonly int handSize = 4;
+    [HideInInspector] public List<CreatureCard> activeCreatures; //Creature cards that are Instantiated
     [HideInInspector] public List<SpellCard> activeSpells; //Spell cards that are Instantiated
-    [HideInInspector] public List<SummonCard> activeSummons; //Summon cards that are Instantiated
-    [HideInInspector] public SupplyCard activeSupply; //ONLY 1 Supply card that is Instantiated
+    [HideInInspector] public WeaponCard activeWeapon; //ONLY 1 Weapon card can be Instantiated
 }

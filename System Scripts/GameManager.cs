@@ -37,8 +37,8 @@ public class GameManager : MonoBehaviour
         playerSO.deck = new List<Card>();
         playerSO.deck.Insert(0, cardsSO.blazeBall);
         playerSO.deck.Insert(1, cardsSO.bird);
-        playerSO.deck.Insert(2, cardsSO.basicBlade);
-        playerSO.deck.Insert(3, cardsSO.basicBow);
+        playerSO.deck.Insert(2, cardsSO.simpleSword);
+        playerSO.deck.Insert(3, cardsSO.beginnersBow);
 
         playerSO.handCards = new List<Card>();
         for (int i = 0; i < playerSO.handSize; i++)
@@ -48,8 +48,8 @@ public class GameManager : MonoBehaviour
         }
 
         playerSO.activeSpells = new List<SpellCard>();
-        playerSO.activeSummons = new List<SummonCard>();
-        playerSO.activeSupply = null;
+        playerSO.activeCreatures = new List<CreatureCard>();
+        playerSO.activeWeapon = null;
     }
 
     public void LoadNextScene(string nextSceneName)

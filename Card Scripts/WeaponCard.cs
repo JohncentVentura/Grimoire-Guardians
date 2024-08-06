@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SupplyCard : Card
+public class WeaponCard : Card
 {
     public enum STATES
     {
@@ -15,7 +15,7 @@ public class SupplyCard : Card
     {
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        category = GameManager.I.cardsSO.cardCategoriesDict["Supply"];
+        category = GameManager.I.cardsSO.cardCategoryDict[CardsSO.TYPES.WEAPON];
     }
 
     protected void SwitchStates(bool isUsingPhysics)

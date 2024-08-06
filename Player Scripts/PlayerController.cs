@@ -43,9 +43,9 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
                 GameManager.I.playerSO.playerDirection = InputManager.I.PlayerGetAxisRaw();
                 animator.SetFloat("PlayerDirection", GameManager.I.playerSO.playerDirection.x);
 
-                if (GameManager.I.playerSO.activeSupply)
+                if (GameManager.I.playerSO.activeWeapon)
                 {
-                    GameManager.I.playerSO.activeSupply.animator.SetFloat("PlayerDirection", GameManager.I.playerSO.playerDirection.x);
+                    GameManager.I.playerSO.activeWeapon.animator.SetFloat("PlayerDirection", GameManager.I.playerSO.playerDirection.x);
                 }
             }
 
@@ -56,39 +56,11 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
             playerStateMachine.state = PlayerStateMachine.STATES.IDLE;
         }
 
-        //Input for player attacking
-        InputManager.I.PlayerSetButtonDown(InputManager.I.playerAttackKey, () =>
-        {
-            InputManager.I.canPlayerInput = false;
-            if (GameManager.I.playerSO.activeSupply == null)
-            {
-                Debug.Log("Player can only attack if equipped with a supply card");
-                InputManager.I.canPlayerInput = true;
-            }
-            else if (GameManager.I.playerSO.activeSupply.type == GameManager.I.cardsSO.supplyCardTypesDict["Sword"])
-            {
-                playerStateMachine.state = PlayerStateMachine.STATES.SWORD_ATK;
-                GameManager.I.playerSO.activeSupply.state = SupplyCard.STATES.ATTACK;
-            }
-            else if (GameManager.I.playerSO.activeSupply.type == GameManager.I.cardsSO.supplyCardTypesDict["Heavy"])
-            {
-
-            }
-            else if (GameManager.I.playerSO.activeSupply.type == GameManager.I.cardsSO.supplyCardTypesDict["Bow"])
-            {
-
-            }
-            else if (GameManager.I.playerSO.activeSupply.type == GameManager.I.cardsSO.supplyCardTypesDict["Staff"])
-            {
-
-            }
-        });
-
         for (int i = 0; i < GameManager.I.playerSO.handSize; i++)
         {
             //Input for playing cards
             InputManager.I.PlayerSetButtonDown(InputManager.I.playerCardKeys[i], () =>
-            {
+            {   
                 PlayCard(i);
             });
 
@@ -98,6 +70,38 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
             //Duration timer
             CardDurationTimer(i);
         }
+
+        //Input for player attacking
+        InputManager.I.PlayerSetButtonDown(InputManager.I.playerAttackKey, () =>
+        {
+            InputManager.I.canPlayerInput = false;
+            if (GameManager.I.playerSO.activeWeapon == null)
+            {
+                Debug.Log("Player need to equip weapon card to attack");
+                InputManager.I.canPlayerInput = true;
+            }
+            else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.SWORD])
+            {
+                playerStateMachine.state = PlayerStateMachine.STATES.SWORD_ATK;
+                GameManager.I.playerSO.activeWeapon.state = WeaponCard.STATES.ATTACK;
+            }
+            else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.POLEARM])
+            {
+
+            }
+            else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.HEAVY])
+            {
+
+            }
+            else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.BOW])
+            {
+
+            }
+            else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.STAFF])
+            {
+
+            }
+        });
 
         //Mana regeneration timer
         if (GameManager.I.playerSO.currentMana < GameManager.I.playerSO.maxMana)
@@ -114,38 +118,37 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
     public void PlayCard(int i)
     {
         if (GameManager.I.playerSO.currentMana >= GameManager.I.playerSO.handCards[i].manaCost && GameManager.I.playerSO.handCards[i].cooldownTimer <= 0)
-        {
-            if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoriesDict["Spell"])
+        {   
+            if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoryDict[CardsSO.TYPES.CREATURE])
+            {
+                CreatureCard cardObject = Instantiate((CreatureCard)GameManager.I.playerSO.handCards[i]);
+                cardObject.transform.parent = transform.parent.Find("Allies");
+                cardObject.transform.position = centerPosition.position;
+                cardObject.UseCard();
+            }
+            else if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoryDict[CardsSO.TYPES.SPELL])
             {
                 SpellCard cardObject = Instantiate((SpellCard)GameManager.I.playerSO.handCards[i]);
                 cardObject.transform.parent = transform.parent.Find("Spells");
                 cardObject.transform.position = frontHand.transform.position;
                 cardObject.UseCard();
             }
-            else if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoriesDict["Summon"])
-            {
-                SummonCard cardObject = Instantiate((SummonCard)GameManager.I.playerSO.handCards[i]);
-                cardObject.transform.parent = transform.parent.Find("Summons");
-                cardObject.transform.position = centerPosition.position;
-                cardObject.UseCard();
-            }
-            else if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoriesDict["Supply"])
+            else if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoryDict[CardsSO.TYPES.WEAPON])
             {
                 //Destroy current activeSupply so that there can only be 1 activeSupply
-                if (GameManager.I.playerSO.activeSupply)
+                if (GameManager.I.playerSO.activeWeapon)
                 {
                     Destroy(equipPosition.GetChild(0).gameObject);
-                    GameManager.I.playerSO.activeSupply = null;
+                    GameManager.I.playerSO.activeWeapon = null;
                 }
 
-                SupplyCard cardObject = Instantiate((SupplyCard)GameManager.I.playerSO.handCards[i]);
-                GameManager.I.playerSO.activeSupply = cardObject;
-                Debug.Log("activeSupply: " + GameManager.I.playerSO.activeSupply);
-                cardObject.transform.parent = equipPosition.transform;
-                cardObject.transform.position = equipPosition.transform.position;
-                GameManager.I.playerSO.activeSupply.animator.SetFloat("PlayerDirection", GameManager.I.playerSO.playerDirection.x);
-                GameManager.I.playerSO.activeSupply.state = SupplyCard.STATES.IDLE;
-                cardObject.UseCard();
+                GameManager.I.playerSO.activeWeapon = Instantiate((WeaponCard)GameManager.I.playerSO.handCards[i]);
+                Debug.Log("activeWeapon: " + GameManager.I.playerSO.activeWeapon);
+                GameManager.I.playerSO.activeWeapon.transform.parent = equipPosition.transform;
+                GameManager.I.playerSO.activeWeapon.transform.position = equipPosition.transform.position;
+                GameManager.I.playerSO.activeWeapon.animator.SetFloat("PlayerDirection", GameManager.I.playerSO.playerDirection.x);
+                GameManager.I.playerSO.activeWeapon.state = WeaponCard.STATES.IDLE;
+                GameManager.I.playerSO.activeWeapon.UseCard();
             }
 
             GameManager.I.playerSO.currentMana -= GameManager.I.playerSO.handCards[i].manaCost;

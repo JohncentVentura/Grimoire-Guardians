@@ -12,16 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bcc7fc665ef3cbe4f95efd0989b9080c, type: 3}
   m_Name: CardsSO
   m_EditorClassIdentifier: 
-  manaImageSprites:
-  - {fileID: 21300000, guid: 732b5ee08a0e3f0469ab8f7fc9e2f64b, type: 3}
-  - {fileID: 21300000, guid: 29f3db1c78f723f449293bff10533a65, type: 3}
-  - {fileID: 21300000, guid: 7ab2f6fe8f6e09449aece9b2e82f0896, type: 3}
-  - {fileID: 21300000, guid: 69f8cbfbe62346b4da6f5c865f274cc6, type: 3}
-  - {fileID: 21300000, guid: a0d786591594c4c42b35975ad579a977, type: 3}
-  - {fileID: 21300000, guid: fef4b8bee283d3c499d77a48f6f12eb4, type: 3}
-  blazeBall: {fileID: 686527138731628856, guid: e6fa9e77028008f42b20bfe8f5edf6c4, type: 3}
-  snowBall: {fileID: 4566876444814224052, guid: 31837d920687ff249b746687fad664d2, type: 3}
-  simpleSlime: {fileID: 3745178060259960977, guid: 049210499de36bc4ea16c0970c344613, type: 3}
   bird: {fileID: 1747507792258246723, guid: 7fae4d0f06ac6774cb80421c5feebce5, type: 3}
-  basicBlade: {fileID: 7861837027320870060, guid: 1e17a1f81c9e66046ac882d3c22a8b8c, type: 3}
-  basicBow: {fileID: 8397356250254733062, guid: bdb9b86e3aef2a64a82f29a9d533f945, type: 3}
+  blazeBall: {fileID: 686527138731628856, guid: e6fa9e77028008f42b20bfe8f5edf6c4, type: 3}
+  simpleSword: {fileID: 7861837027320870060, guid: 1e17a1f81c9e66046ac882d3c22a8b8c, type: 3}
+  beginnersBow: {fileID: 8397356250254733062, guid: bdb9b86e3aef2a64a82f29a9d533f945, type: 3}

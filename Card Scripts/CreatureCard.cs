@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SummonCard : Card
+public class CreatureCard : Card
 {
     [HideInInspector] public float health;
     [HideInInspector] public float damage;
@@ -11,6 +11,6 @@ public class SummonCard : Card
     protected override void InitCardCategory()
     {   
         spriteRenderer = GetComponent<SpriteRenderer>();
-        category = GameManager.I.cardsSO.cardCategoriesDict["Summon"];
+        category = GameManager.I.cardsSO.cardCategoryDict[CardsSO.TYPES.CREATURE];
     }
 }

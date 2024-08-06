@@ -6,25 +6,44 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CardsSO", menuName = "ScriptableObjects/CardsSO", order = 1)]
 public class CardsSO : ScriptableObject
 {
-    #region CARD_STATS
-    [HideInInspector] public readonly Dictionary<string, string> cardCategoriesDict = new() { { "Spell", "Spell" }, { "Summon", "Summon" }, { "Supply", "Supply" } };
-    [HideInInspector] public readonly Dictionary<string, string> spellCardTypesDict = new() { { "spell", "Spell" }, { "summon", "Summon" }, { "supply", "Supply" } };
-    [HideInInspector] public readonly Dictionary<string, string> summonCardTypesDict = new() { { "spell", "Spell" }, { "summon", "Summon" }, { "supply", "Supply" } };
-    [HideInInspector] public readonly Dictionary<string, string> supplyCardTypesDict 
-        = new() { { "Sword", "Sword" }, { "Heavy", "Heavy" }, { "Bow", "Bow" }, { "Staff", "Staff" }, { "Polearm", "Polearm" } };
-    
+    public enum TYPES
+    {
+        //cardCategoryDict types
+        CREATURE,
+        SPELL,
+        WEAPON,
+        //creatureTypeDict types
+
+        //spellTypeDict types
+
+        //weaponTypeDict types
+        SWORD,
+        POLEARM,
+        HEAVY,
+        BOW,
+        STAFF
+    }
+
+    public readonly Dictionary<TYPES, string> cardCategoryDict = new() { { TYPES.CREATURE, "Creature" }, { TYPES.SPELL, "Spell" }, { TYPES.WEAPON, "Weapon" } };
+    public readonly Dictionary<TYPES, string> creatureTypeDict = new() { };
+    public readonly Dictionary<TYPES, string> spellTypeDict = new() { };
+    public readonly Dictionary<TYPES, string> weaponTypeDict = new()
+    { { TYPES.SWORD, "Sword" }, { TYPES.POLEARM, "Polearm" }, { TYPES.HEAVY, "Heavy" }, { TYPES.BOW, "Bow" }, { TYPES.STAFF, "Staff" } };
+
+    #region CREATURE CARDS
+    [Header("CREATURE CARDS")]
+    public CreatureCard bird;
     #endregion
 
+    #region SPELL CARDS
     [Header("SPELL CARDS")]
     public SpellCard blazeBall;
-    public SpellCard snowBall;
+    #endregion
 
-    [Header("SUMMON CARDS")]
-    public SummonCard bird;
-    public SummonCard simpleSlime;
-
-    [Header("SUPPLY CARDS")]
-    public SupplyCard basicBlade;
-    public SupplyCard basicBow;
+    #region WEAPON CARDS
+    [Header("WEAPON CARDS")]
+    public WeaponCard simpleSword;
+    public WeaponCard beginnersBow;
+    #endregion
 
 }
