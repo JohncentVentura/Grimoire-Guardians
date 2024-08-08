@@ -33,16 +33,19 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
         //cinemachineVirtualCamera.Follow = centerPosition.transform;
     }
 
-    private void Update()
-    {
-        //Debug.Log("pc equipPosition: " + equipPosition.transform.localPosition);
+    public float animSpeed = 1;
 
+    private void Update()
+    {       
+        animator.speed = animSpeed;
+        if(GameManager.I.playerSO.activeWeapon) GameManager.I.playerSO.activeWeapon.animator.speed = animSpeed;
+    
         //Input for player movement
         if (InputManager.I.canPlayerInput && InputManager.I.PlayerGetAxisRaw() == Vector2.zero)
         {
             playerStateMachine.state = PlayerStateMachine.STATES.IDLE;
         }
-        else if (InputManager.I.PlayerGetAxisRaw() != Vector2.zero)
+        else if (InputManager.I.canPlayerInput && InputManager.I.PlayerGetAxisRaw() != Vector2.zero)
         {
             //If moving in y-axis only, playerDirection will save the last x-axis so it cannot become 0
             if (InputManager.I.PlayerGetAxisRaw().x != 0)
@@ -67,11 +70,8 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
                 PlayCard(i);
             });
 
-            //Cooldown timer
-            CardCooldownTimer(i);
-
-            //Duration timer
-            CardDurationTimer(i);
+            CardCooldownTimerTick(i);
+            CardDurationTimerTick(i);
         }
 
         //Input for player attacking
@@ -97,22 +97,17 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
             }
             else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.BOW])
             {
-                if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.BOW]
-                || GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.STAFF])
-                {
-                    GameManager.I.playerSO.activeWeapon.transform.rotation = Quaternion.Euler(0, 0, 135f);
-                }
-
+                GameManager.I.playerSO.activeWeapon.transform.rotation = Quaternion.Euler(0, 0, 135f); //Rotates activeWeapon to properly look at target
                 playerStateMachine.state = PlayerStateMachine.STATES.BOW_ATK;
                 GameManager.I.playerSO.activeWeapon.state = WeaponCard.STATES.ATTACK;
             }
             else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.STAFF])
             {
-
+                GameManager.I.playerSO.activeWeapon.transform.rotation = Quaternion.Euler(0, 0, 135f); //Rotates activeWeapon to properly look at target
             }
         });
 
-        //Mana regeneration timer
+        //Mana Regeneration Timer Tick
         if (GameManager.I.playerSO.currentMana < GameManager.I.playerSO.maxMana)
         {
             GameManager.I.playerSO.currentMana += GameManager.I.playerSO.manaRegeneration;
@@ -129,11 +124,12 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
         if (GameManager.I.playerSO.currentMana >= GameManager.I.playerSO.handCards[i].manaCost && GameManager.I.playerSO.handCards[i].cooldownTimer <= 0)
         {
             if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoryDict[CardsSO.TYPES.CREATURE])
-            {
+            {   
                 CreatureCard cardObject = Instantiate((CreatureCard)GameManager.I.playerSO.handCards[i]);
                 cardObject.transform.parent = transform.parent.Find("Allies");
                 cardObject.transform.position = centerPosition.position;
                 cardObject.UseCard();
+                //cardObject.GetStat(CreatureCard.STATS.HitPoints).currentValue = 1;
             }
             else if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoryDict[CardsSO.TYPES.SPELL])
             {
@@ -174,7 +170,7 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
         }
     }
 
-    public void CardCooldownTimer(int i)
+    public void CardCooldownTimerTick(int i)
     {
         if (GameManager.I.playerSO.handCards[i].cooldownTimer > 0)
         {
@@ -186,18 +182,15 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
         }
     }
 
-    public void CardDurationTimer(int i)
+    public void CardDurationTimerTick(int i)
     {
-        if (GameManager.I.playerSO.handCards[i])
+        if (GameManager.I.playerSO.handCards[i].durationTimer > 0)
         {
-            if (GameManager.I.playerSO.handCards[i].durationTimer > 0)
-            {
-                GameManager.I.playerSO.handCards[i].durationTimer -= Time.deltaTime;
-            }
-            else if (GameManager.I.playerSO.handCards[i].durationTimer <= 0)
-            {
-                GameManager.I.playerSO.handCards[i].durationTimer = 0;
-            }
+            GameManager.I.playerSO.handCards[i].durationTimer -= Time.deltaTime;
+        }
+        else if (GameManager.I.playerSO.handCards[i].durationTimer <= 0)
+        {
+            GameManager.I.playerSO.handCards[i].durationTimer = 0;
         }
     }
     #endregion

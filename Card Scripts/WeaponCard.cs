@@ -31,7 +31,7 @@ public class WeaponCard : Card
         }
     }
 
-    public void ResetState() //Called as an event in animation
+    public void AnimEventResetState() //Called as an event in animation
     {
         state = STATES.IDLE;
         transform.rotation = Quaternion.identity; //For Bow-type & Staff-type Weapons

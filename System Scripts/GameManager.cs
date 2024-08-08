@@ -20,7 +20,7 @@ public class GameManager : MonoBehaviour
 
     [Header("Scriptable Objects")]
     public PlayerSO playerSO; //Initialized in script, contains data of player position, stats, cards, & decks
-    public CardsSO cardsSO; //Initialized in inspector, contains card objects prefabs, card types, & card elements
+    public CardsSO cardsSO; //Initialized in inspector, contains card objects prefabs, card categories, card types
 
     private void Start()
     {
@@ -34,7 +34,7 @@ public class GameManager : MonoBehaviour
         playerSO.moveSpeed = 60;
         playerSO.playerDirection = Vector2.right;
 
-        playerSO.deck = new List<Card>();
+        //playerSO.deck = new List<Card>();
         playerSO.deck.Insert(0, cardsSO.blazeBall);
         playerSO.deck.Insert(1, cardsSO.bird);
         playerSO.deck.Insert(2, cardsSO.simpleSword);
@@ -47,14 +47,31 @@ public class GameManager : MonoBehaviour
             playerSO.handCards[i].InitCard();
         }
 
-        playerSO.activeSpells = new List<SpellCard>();
         playerSO.activeCreatures = new List<CreatureCard>();
+        playerSO.activeSpells = new List<SpellCard>();
         playerSO.activeWeapon = null;
     }
 
-    public void LoadNextScene(string nextSceneName)
+    public void OnClickLoadScene(string nextSceneName) //Called in StareMenuScene
     {
         SceneManager.LoadScene(nextSceneName);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            playerSO.deck.Remove(cardsSO.beginnersBow);
+        }
+
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            playerSO.deck = new List<Card>();
+            playerSO.deck.Insert(0, cardsSO.blazeBall);
+            playerSO.deck.Insert(1, cardsSO.bird);
+            playerSO.deck.Insert(2, cardsSO.simpleSword);
+            playerSO.deck.Insert(3, cardsSO.beginnersBow);
+        }
     }
 
 }

@@ -22,7 +22,6 @@ public class Card : MonoBehaviour
     [HideInInspector] public float durationTimer;
     #endregion
 
-    #region PUBLIC FUNCTIONS
     public virtual void InitCard()
     {
 
@@ -32,14 +31,11 @@ public class Card : MonoBehaviour
     {
         //Debug.Log("Player uses a " + manaCost + " Cost " + category + " card called " + cardName);
     }
-    #endregion
 
-    #region PROTECTED FUNCTIONS
     protected virtual void InitCardCategory()
     {
 
     }
-    #endregion
 
 }
 

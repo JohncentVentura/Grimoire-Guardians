@@ -9,19 +9,13 @@ public class CardsSO : ScriptableObject
     public enum TYPES
     {
         //cardCategoryDict types
-        CREATURE,
-        SPELL,
-        WEAPON,
+        CREATURE, SPELL, WEAPON,
         //creatureTypeDict types
 
         //spellTypeDict types
 
         //weaponTypeDict types
-        SWORD,
-        POLEARM,
-        HEAVY,
-        BOW,
-        STAFF
+        SWORD, POLEARM, HEAVY, BOW, STAFF
     }
 
     public readonly Dictionary<TYPES, string> cardCategoryDict = new() { { TYPES.CREATURE, "Creature" }, { TYPES.SPELL, "Spell" }, { TYPES.WEAPON, "Weapon" } };
@@ -30,18 +24,18 @@ public class CardsSO : ScriptableObject
     public readonly Dictionary<TYPES, string> weaponTypeDict = new()
     { { TYPES.SWORD, "Sword" }, { TYPES.POLEARM, "Polearm" }, { TYPES.HEAVY, "Heavy" }, { TYPES.BOW, "Bow" }, { TYPES.STAFF, "Staff" } };
 
-    #region CREATURE CARDS
-    [Header("CREATURE CARDS")]
+    #region Creature Cards
+    [Header("Creature Cards")]
     public CreatureCard bird;
     #endregion
 
-    #region SPELL CARDS
-    [Header("SPELL CARDS")]
+    #region Spell Cards
+    [Header("Spell Cards")]
     public SpellCard blazeBall;
     #endregion
 
-    #region WEAPON CARDS
-    [Header("WEAPON CARDS")]
+    #region Weapon Cards
+    [Header("Weapon Cards")]
     public WeaponCard simpleSword;
     public WeaponCard beginnersBow;
     #endregion

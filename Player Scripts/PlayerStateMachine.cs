@@ -24,7 +24,7 @@ public class PlayerStateMachine : MonoBehaviour //State & Animations
     private void FixedUpdate() => SwitchStates(true);
     private void LateUpdate()
     {
-        //Some playerController properties are being animated, we can only override it in LateUpdate()
+        //Some playerController properties are being animated, we can only override those properties in LateUpdate()
         if (state == STATES.BOW_ATK || state == STATES.STAFF_ATK)
         {
             //Follow Mouse Cursor
@@ -32,7 +32,6 @@ public class PlayerStateMachine : MonoBehaviour //State & Animations
             Vector3 mouseDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             Vector3 mouseDistance = Vector2.ClampMagnitude(mouseDirection - playerController.centerPosition.transform.position, maxDistance);
             playerController.equipPosition.transform.position = mouseDistance + playerController.centerPosition.transform.position;
-            Debug.Log("equipPosition: " + playerController.equipPosition.transform.position);
 
             //Rotate to Mouse Cursor
             Vector3 mousePos = Input.mousePosition;
@@ -79,7 +78,7 @@ public class PlayerStateMachine : MonoBehaviour //State & Animations
         }
     }
 
-    public void ResetState() //Called as an event in animation
+    public void AnimEventResetState() //Called as an event in animation
     {
         state = STATES.IDLE;
         playerController.equipPosition.rotation = Quaternion.identity; //For Bow-type & Staff-type Weapons
