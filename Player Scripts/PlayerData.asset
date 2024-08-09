@@ -10,9 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 207633ee674eedc42b239220b49f6ed4, type: 3}
-  m_Name: PlayerSO
+  m_Name: PlayerData
   m_EditorClassIdentifier: 
-  playerPosition: {x: 0, y: 0}
-  playerHealth: 10
-  playerMana: 10
-  playerSpeed: 60
+  worldPosition: {x: 0, y: 0}
+  maxHealth: 0
+  currentHealth: 0
+  maxMana: 0
+  currentMana: 0
+  manaRegeneration: 0
+  moveSpeed: 0
+  playerDirection: {x: 1, y: 0}
+  deck: []
+  handCards: []
+  activeCreatures: []
+  activeSpells: []
+  activeWeapon: {fileID: 0}

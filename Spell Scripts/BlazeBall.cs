@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BlazeBall : SpellCard
+public class BlazeBall : Spell
 {
     public override void InitCard()
     {

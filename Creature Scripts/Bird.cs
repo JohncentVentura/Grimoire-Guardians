@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Bird : CreatureCard
+public class Bird : Creature
 {
     private void Start()
     {

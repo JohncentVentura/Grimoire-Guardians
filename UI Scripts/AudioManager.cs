@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-    public static AudioManager I { get; private set; } //I means Instance since this class is a singleton
+    public static AudioManager Instance { get; private set; } //Only instance of this class to become a singleton
     private void Awake()
     {
-        if (I != null)
+        if (Instance != null)
         {
             Destroy(gameObject);
             return;
         }
-        I = this;
+        Instance = this;
         DontDestroyOnLoad(gameObject);
     }
 

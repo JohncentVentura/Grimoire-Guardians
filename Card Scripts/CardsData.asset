@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bcc7fc665ef3cbe4f95efd0989b9080c, type: 3}
-  m_Name: CardsSO
+  m_Name: CardsData
   m_EditorClassIdentifier: 
   bird: {fileID: 1747507792258246723, guid: 7fae4d0f06ac6774cb80421c5feebce5, type: 3}
   blazeBall: {fileID: 686527138731628856, guid: e6fa9e77028008f42b20bfe8f5edf6c4, type: 3}

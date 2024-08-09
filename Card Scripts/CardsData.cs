@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "CardsSO", menuName = "ScriptableObjects/CardsSO", order = 1)]
-public class CardsSO : ScriptableObject
+[System.Serializable]
+[CreateAssetMenu(fileName = "CardsData", menuName = "ScriptableObjects/CardsData", order = 1)]
+
+public class CardsData : ScriptableObject
 {
     public enum TYPES
     {
@@ -26,18 +28,18 @@ public class CardsSO : ScriptableObject
 
     #region Creature Cards
     [Header("Creature Cards")]
-    public CreatureCard bird;
+    public Creature bird;
     #endregion
 
     #region Spell Cards
     [Header("Spell Cards")]
-    public SpellCard blazeBall;
+    public Spell blazeBall;
     #endregion
 
     #region Weapon Cards
     [Header("Weapon Cards")]
-    public WeaponCard simpleSword;
-    public WeaponCard beginnersBow;
+    public Weapon simpleSword;
+    public Weapon beginnersBow;
     #endregion
 
 }

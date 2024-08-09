@@ -6,8 +6,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour //Inputs & Cards
 {
-    [Header("Player Components & Children")]
-    [HideInInspector] public PlayerStateMachine playerStateMachine;
+    [HideInInspector] public InputManager inputManager;
+    [HideInInspector] public PlayerManager playerManager;
+    [HideInInspector] public PlayerData playerData;
+
     [HideInInspector] public Animator animator;
     [HideInInspector] public Rigidbody2D rb;
     [HideInInspector] public Transform centerPosition;
@@ -15,15 +17,18 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
     [HideInInspector] public Transform backHand;
     [HideInInspector] public Transform equipPosition; //Parent & position of supply card objects
 
-    //[Header("Utilities")]
+    //[Header("UI")]
     //public CinemachineVirtualCamera cinemachineVirtualCamera;
 
     private void Start()
     {
-        playerStateMachine = GetComponent<PlayerStateMachine>();
-        playerStateMachine.state = PlayerStateMachine.STATES.IDLE;
+        inputManager = InputManager.Instance;
+        playerManager = PlayerManager.Instance;
+        playerData = playerManager.playerData;
+        playerData.state = PlayerData.STATES.IDLE;
+
         animator = GetComponent<Animator>();
-        animator.SetFloat("Blend", GameManager.I.playerSO.playerDirection.x);
+        animator.SetFloat("Blend", playerData.playerDirection.x);
         rb = GetComponent<Rigidbody2D>();
         centerPosition = transform.GetChild(0);
         frontHand = centerPosition.transform.GetChild(0);
@@ -33,166 +38,308 @@ public class PlayerController : MonoBehaviour //Inputs & Cards
         //cinemachineVirtualCamera.Follow = centerPosition.transform;
     }
 
+    /* Attack Speed
     public float animSpeed = 1;
+    animator.speed = animSpeed;
+    if (playerData.activeWeapon) playerData.activeWeapon.animator.speed = animSpeed;
+    */
 
     private void Update()
-    {       
-        animator.speed = animSpeed;
-        if(GameManager.I.playerSO.activeWeapon) GameManager.I.playerSO.activeWeapon.animator.speed = animSpeed;
-    
-        //Input for player movement
-        if (InputManager.I.canPlayerInput && InputManager.I.PlayerGetAxisRaw() == Vector2.zero)
+    {
+        if (inputManager.canPlayerInput)
         {
-            playerStateMachine.state = PlayerStateMachine.STATES.IDLE;
-        }
-        else if (InputManager.I.canPlayerInput && InputManager.I.PlayerGetAxisRaw() != Vector2.zero)
-        {
-            //If moving in y-axis only, playerDirection will save the last x-axis so it cannot become 0
-            if (InputManager.I.PlayerGetAxisRaw().x != 0)
-            {
-                GameManager.I.playerSO.playerDirection = InputManager.I.PlayerGetAxisRaw();
-                animator.SetFloat("Blend", GameManager.I.playerSO.playerDirection.x);
+            inputManager.playerMoveInput.x = Input.GetAxisRaw(inputManager.playerMovementKeys[0]);
+            inputManager.playerMoveInput.y = Input.GetAxisRaw(inputManager.playerMovementKeys[1]);
+            inputManager.playerMoveInput = inputManager.playerMoveInput.normalized;
 
-                if (GameManager.I.playerSO.activeWeapon)
+            for (int i = 0; i < playerData.handCards.Count; i++)
+            {
+                if (Input.GetButtonDown(inputManager.playerCardKeys[i]))
                 {
-                    GameManager.I.playerSO.activeWeapon.animator.SetFloat("Blend", GameManager.I.playerSO.playerDirection.x);
+                    PlayCard(i);
+                }
+                else if (Input.GetButtonDown(inputManager.playerAttackKey))
+                {
+                    inputManager.canPlayerInput = false;
+
+                    if (!playerData.activeWeapon)
+                    {
+                        inputManager.canPlayerInput = true;
+                    }
+                    else if (playerData.activeWeapon.type == GameManager.Instance.cardsData.weaponTypeDict[CardsData.TYPES.SWORD])
+                    {
+                        playerData.state = PlayerData.STATES.SWORD_ATK;
+                        playerData.activeWeapon.state = Weapon.STATES.ATTACK;
+                    }
+                    else if (playerData.activeWeapon.type == GameManager.Instance.cardsData.weaponTypeDict[CardsData.TYPES.POLEARM])
+                    {
+
+                    }
+                    else if (playerData.activeWeapon.type == GameManager.Instance.cardsData.weaponTypeDict[CardsData.TYPES.HEAVY])
+                    {
+
+                    }
+                    else if (playerData.activeWeapon.type == GameManager.Instance.cardsData.weaponTypeDict[CardsData.TYPES.BOW])
+                    {
+                        playerData.activeWeapon.transform.rotation = Quaternion.Euler(0, 0, 135f); //Rotates activeWeapon to properly look at target
+                        playerData.state = PlayerData.STATES.BOW_ATK;
+                        playerData.activeWeapon.state = Weapon.STATES.ATTACK;
+                    }
+                    else if (playerData.activeWeapon.type == GameManager.Instance.cardsData.weaponTypeDict[CardsData.TYPES.STAFF])
+                    {
+                        playerData.activeWeapon.transform.rotation = Quaternion.Euler(0, 0, 135f); //Rotates activeWeapon to properly look at target
+                    }
+                }
+                else if (inputManager.playerMoveInput != Vector2.zero)
+                {
+                    //If moving in y-axis only, playerDirection will save the last x-axis so it cannot become 0
+                    if (inputManager.playerMoveInput.x != 0)
+                    {
+                        playerData.playerDirection = inputManager.playerMoveInput;
+                        animator.SetFloat("Blend", playerData.playerDirection.x);
+
+                        if (playerData.activeWeapon)
+                        {
+                            playerData.activeWeapon.animator.SetFloat("Blend", playerData.playerDirection.x);
+                        }
+                    }
+
+                    playerData.state = PlayerData.STATES.MOVE;
+                }
+                else if (inputManager.playerMoveInput == Vector2.zero)
+                {
+                    playerData.state = PlayerData.STATES.IDLE;
                 }
             }
-
-            playerStateMachine.state = PlayerStateMachine.STATES.MOVE;
         }
 
-        for (int i = 0; i < GameManager.I.playerSO.handSize; i++)
+        StateMachine(false);
+    }
+
+    private void FixedUpdate() => StateMachine(true);
+
+    private void LateUpdate()
+    {
+        //Some playerController properties are being animated, we can only override those properties in LateUpdate()
+        if (playerData.state == PlayerData.STATES.BOW_ATK || playerData.state == PlayerData.STATES.STAFF_ATK)
         {
-            //Input for playing cards
-            InputManager.I.PlayerSetButtonDown(InputManager.I.playerCardKeys[i], () =>
-            {
-                PlayCard(i);
-            });
+            //Follow Mouse Cursor
+            float maxDistance = 0.15f;
+            Vector3 mouseDirection = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            Vector3 mouseDistance = Vector2.ClampMagnitude(mouseDirection - centerPosition.transform.position, maxDistance);
+            equipPosition.transform.position = mouseDistance + centerPosition.transform.position;
 
-            CardCooldownTimerTick(i);
-            CardDurationTimerTick(i);
-        }
-
-        //Input for player attacking
-        InputManager.I.PlayerSetButtonDown(InputManager.I.playerAttackKey, () =>
-        {
-            InputManager.I.canPlayerInput = false;
-            if (!GameManager.I.playerSO.activeWeapon)
-            {
-                InputManager.I.canPlayerInput = true;
-            }
-            else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.SWORD])
-            {
-                playerStateMachine.state = PlayerStateMachine.STATES.SWORD_ATK;
-                GameManager.I.playerSO.activeWeapon.state = WeaponCard.STATES.ATTACK;
-            }
-            else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.POLEARM])
-            {
-
-            }
-            else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.HEAVY])
-            {
-
-            }
-            else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.BOW])
-            {
-                GameManager.I.playerSO.activeWeapon.transform.rotation = Quaternion.Euler(0, 0, 135f); //Rotates activeWeapon to properly look at target
-                playerStateMachine.state = PlayerStateMachine.STATES.BOW_ATK;
-                GameManager.I.playerSO.activeWeapon.state = WeaponCard.STATES.ATTACK;
-            }
-            else if (GameManager.I.playerSO.activeWeapon.type == GameManager.I.cardsSO.weaponTypeDict[CardsSO.TYPES.STAFF])
-            {
-                GameManager.I.playerSO.activeWeapon.transform.rotation = Quaternion.Euler(0, 0, 135f); //Rotates activeWeapon to properly look at target
-            }
-        });
-
-        //Mana Regeneration Timer Tick
-        if (GameManager.I.playerSO.currentMana < GameManager.I.playerSO.maxMana)
-        {
-            GameManager.I.playerSO.currentMana += GameManager.I.playerSO.manaRegeneration;
-        }
-        else if (GameManager.I.playerSO.currentMana >= GameManager.I.playerSO.maxMana)
-        {
-            GameManager.I.playerSO.currentMana = GameManager.I.playerSO.maxMana;
+            //Rotate to Mouse Cursor
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = 5.23f;
+            Vector3 objectPos = Camera.main.WorldToScreenPoint(centerPosition.transform.position);
+            mousePos.x -= objectPos.x;
+            mousePos.y -= objectPos.y;
+            float angle = Mathf.Atan2(mousePos.y, mousePos.x) * Mathf.Rad2Deg;
+            equipPosition.transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
         }
     }
 
-    #region CARDS
+    #region TODO: Transfer to PlayerManager
     public void PlayCard(int i)
     {
-        if (GameManager.I.playerSO.currentMana >= GameManager.I.playerSO.handCards[i].manaCost && GameManager.I.playerSO.handCards[i].cooldownTimer <= 0)
+        if (playerData.currentMana >= playerData.handCards[i].manaCost && playerData.handCards[i].cooldownTimer <= 0)
         {
-            if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoryDict[CardsSO.TYPES.CREATURE])
-            {   
-                CreatureCard cardObject = Instantiate((CreatureCard)GameManager.I.playerSO.handCards[i]);
+            if (playerData.handCards[i].category == GameManager.Instance.cardsData.cardCategoryDict[CardsData.TYPES.CREATURE])
+            {
+                Creature cardObject = Instantiate((Creature)playerData.handCards[i]);
                 cardObject.transform.parent = transform.parent.Find("Allies");
                 cardObject.transform.position = centerPosition.position;
                 cardObject.UseCard();
                 //cardObject.GetStat(CreatureCard.STATS.HitPoints).currentValue = 1;
             }
-            else if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoryDict[CardsSO.TYPES.SPELL])
+            else if (playerData.handCards[i].category == GameManager.Instance.cardsData.cardCategoryDict[CardsData.TYPES.SPELL])
             {
-                SpellCard cardObject = Instantiate((SpellCard)GameManager.I.playerSO.handCards[i]);
+                Spell cardObject = Instantiate((Spell)playerData.handCards[i]);
                 cardObject.transform.parent = transform.parent.Find("Spells");
                 cardObject.transform.position = frontHand.transform.position;
                 cardObject.UseCard();
             }
-            else if (GameManager.I.playerSO.handCards[i].category == GameManager.I.cardsSO.cardCategoryDict[CardsSO.TYPES.WEAPON])
+            else if (playerData.handCards[i].category == GameManager.Instance.cardsData.cardCategoryDict[CardsData.TYPES.WEAPON])
             {
                 //Destroy current activeSupply so that there can only be 1 activeSupply
-                if (GameManager.I.playerSO.activeWeapon)
+                if (playerData.activeWeapon)
                 {
                     Destroy(equipPosition.GetChild(0).gameObject);
-                    GameManager.I.playerSO.activeWeapon = null;
+                    playerData.activeWeapon = null;
                 }
 
-                GameManager.I.playerSO.activeWeapon = Instantiate((WeaponCard)GameManager.I.playerSO.handCards[i]);
-                Debug.Log("activeWeapon: " + GameManager.I.playerSO.activeWeapon);
-                GameManager.I.playerSO.activeWeapon.transform.parent = equipPosition.transform;
-                GameManager.I.playerSO.activeWeapon.transform.position = equipPosition.transform.position;
-                GameManager.I.playerSO.activeWeapon.animator.SetFloat("Blend", GameManager.I.playerSO.playerDirection.x);
-                GameManager.I.playerSO.activeWeapon.state = WeaponCard.STATES.IDLE;
-                GameManager.I.playerSO.activeWeapon.UseCard();
+                playerData.activeWeapon = Instantiate((Weapon)playerData.handCards[i]);
+                Debug.Log("activeWeapon: " + playerData.activeWeapon);
+                playerData.activeWeapon.transform.parent = equipPosition.transform;
+                playerData.activeWeapon.transform.position = equipPosition.transform.position;
+                playerData.activeWeapon.animator.SetFloat("Blend", playerData.playerDirection.x);
+                playerData.activeWeapon.state = Weapon.STATES.IDLE;
+                playerData.activeWeapon.UseCard();
             }
 
-            GameManager.I.playerSO.currentMana -= GameManager.I.playerSO.handCards[i].manaCost;
-            GameManager.I.playerSO.handCards[i].cooldownTimer = GameManager.I.playerSO.handCards[i].cooldown;
-            GameManager.I.playerSO.handCards[i].durationTimer = GameManager.I.playerSO.handCards[i].duration;
+            playerData.currentMana -= playerData.handCards[i].manaCost;
+            playerData.handCards[i].cooldownTimer = playerData.handCards[i].cooldown;
+            playerData.handCards[i].durationTimer = playerData.handCards[i].duration;
         }
-        else if (GameManager.I.playerSO.currentMana < GameManager.I.playerSO.handCards[i].manaCost)
+        else if (playerData.currentMana < playerData.handCards[i].manaCost)
         {
             Debug.Log("Mana is not enough");
         }
-        else if (GameManager.I.playerSO.handCards[i].cooldownTimer > 0)
+        else if (playerData.handCards[i].cooldownTimer > 0)
         {
-            Debug.Log(GameManager.I.playerSO.handCards[i].cardName + " is on cooldown");
-        }
-    }
-
-    public void CardCooldownTimerTick(int i)
-    {
-        if (GameManager.I.playerSO.handCards[i].cooldownTimer > 0)
-        {
-            GameManager.I.playerSO.handCards[i].cooldownTimer -= Time.deltaTime;
-        }
-        else if (GameManager.I.playerSO.handCards[i].cooldownTimer <= 0)
-        {
-            GameManager.I.playerSO.handCards[i].cooldownTimer = 0;
-        }
-    }
-
-    public void CardDurationTimerTick(int i)
-    {
-        if (GameManager.I.playerSO.handCards[i].durationTimer > 0)
-        {
-            GameManager.I.playerSO.handCards[i].durationTimer -= Time.deltaTime;
-        }
-        else if (GameManager.I.playerSO.handCards[i].durationTimer <= 0)
-        {
-            GameManager.I.playerSO.handCards[i].durationTimer = 0;
+            Debug.Log(playerData.handCards[i].cardName + " is on cooldown");
         }
     }
     #endregion
+
+    private void StateMachine(bool isUsingPhysics)
+    {
+        switch (playerData.state)
+        {
+            case PlayerData.STATES.IDLE:
+                IdleState(isUsingPhysics);
+                break;
+            case PlayerData.STATES.MOVE:
+                MoveState(isUsingPhysics);
+                break;
+            case PlayerData.STATES.CAST_SPELL:
+                CastSpell(isUsingPhysics);
+                break;
+            case PlayerData.STATES.SUMMON_CREATURE:
+                SummonCreature(isUsingPhysics);
+                break;
+            case PlayerData.STATES.SWORD_ATK:
+                SwordAttack(isUsingPhysics);
+                break;
+            case PlayerData.STATES.POLEARM_ATK:
+                PolearmAttack(isUsingPhysics);
+                break;
+            case PlayerData.STATES.HEAVY_ATK:
+                HeavyAttack(isUsingPhysics);
+                break;
+            case PlayerData.STATES.BOW_ATK:
+                BowAttack(isUsingPhysics);
+                break;
+            case PlayerData.STATES.STAFF_ATK:
+                StaffAttack(isUsingPhysics);
+                break;
+        }
+    }
+
+    public void AnimEventResetState() //Called as an event in animation
+    {
+        playerData.state = PlayerData.STATES.IDLE;
+        equipPosition.rotation = Quaternion.identity; //For Bow-type & Staff-type Weapons
+        inputManager.canPlayerInput = true;
+    }
+
+    private void IdleState(bool isUsingPhysics)
+    {
+        if (isUsingPhysics) //Called in FixedUpdate()
+        {
+            rb.velocity = Vector2.zero * Time.fixedDeltaTime;
+        }
+        else //Called in Update()
+        {
+            animator.Play("IdleState");
+        }
+    }
+
+    private void MoveState(bool isUsingPhysics)
+    {
+        if (isUsingPhysics) //Called in FixedUpdate()
+        {
+            rb.velocity = playerData.moveSpeed * Time.fixedDeltaTime * inputManager.playerMoveInput;
+        }
+        else //Called in Update()
+        {
+            animator.Play("MoveState");
+        }
+    }
+
+    private void CastSpell(bool isUsingPhysics)
+    {
+        if (isUsingPhysics) //Called in FixedUpdate()
+        {
+            rb.velocity = Vector2.zero * Time.fixedDeltaTime;
+        }
+        else //Called in Update()
+        {
+
+        }
+    }
+
+    private void SummonCreature(bool isUsingPhysics)
+    {
+        if (isUsingPhysics) //Called in FixedUpdate()
+        {
+            rb.velocity = Vector2.zero * Time.fixedDeltaTime;
+        }
+        else //Called in Update()
+        {
+
+        }
+    }
+
+    private void SwordAttack(bool isUsingPhysics)
+    {
+        if (isUsingPhysics) //Called in FixedUpdate()
+        {
+            rb.velocity = Vector2.zero * Time.fixedDeltaTime;
+        }
+        else //Called in Update()
+        {
+            animator.Play("SwordATKState");
+        }
+    }
+
+    private void PolearmAttack(bool isUsingPhysics)
+    {
+        if (isUsingPhysics) //Called in FixedUpdate()
+        {
+            rb.velocity = Vector2.zero * Time.fixedDeltaTime;
+        }
+        else //Called in Update()
+        {
+
+        }
+    }
+
+    private void HeavyAttack(bool isUsingPhysics)
+    {
+        if (isUsingPhysics) //Called in FixedUpdate()
+        {
+            rb.velocity = Vector2.zero * Time.fixedDeltaTime;
+        }
+        else //Called in Update()
+        {
+
+        }
+    }
+
+    private void BowAttack(bool isUsingPhysics)
+    {
+        if (isUsingPhysics) //Called in FixedUpdate()
+        {
+            rb.velocity = Vector2.zero * Time.fixedDeltaTime;
+        }
+        else //Called in Update()
+        {
+            animator.Play("BowATKState");
+        }
+    }
+
+    private void StaffAttack(bool isUsingPhysics)
+    {
+        if (isUsingPhysics) //Called in FixedUpdate()
+        {
+            rb.velocity = Vector2.zero * Time.fixedDeltaTime;
+        }
+        else //Called in Update()
+        {
+
+        }
+    }
 
 }

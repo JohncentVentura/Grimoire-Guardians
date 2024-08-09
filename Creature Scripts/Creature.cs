@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class CreatureCard : Card
+public class Creature : Card
 {
     public enum STATS
     {
@@ -21,7 +21,7 @@ public class CreatureCard : Card
     {
         cardStatList = new List<CardStat>();
         spriteRenderer = GetComponent<SpriteRenderer>();
-        category = GameManager.I.cardsSO.cardCategoryDict[CardsSO.TYPES.CREATURE];
+        category = GameManager.Instance.cardsData.cardCategoryDict[CardsData.TYPES.CREATURE];
     }
 
 }
